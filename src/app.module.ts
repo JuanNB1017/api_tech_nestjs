@@ -1,13 +1,16 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { joiValidate } from './config';
+import { UsersModule } from './users/users.module';
+import { TasksModule } from './tasks/tasks.module';
+import { AuthModule } from './auth/auth.module';
+import { User } from './users/users.model';
+import { Task } from './tasks/task.model';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { ConfigModule } from '@nestjs/config';
-import { joiValidate } from './config';
 
 @Module({
-  controllers: [AppController],
-  providers: [AppService],
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['.env'],
@@ -20,8 +23,8 @@ import { joiValidate } from './config';
       port: Number(process.env.DB_PORT),
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB,
-      models: [],
+      database: process.env.DB_NAME,
+      models: [User, Task], //especificacion de uso de modelos
       pool: {
         max: 128,
         min: 5,
@@ -30,6 +33,11 @@ import { joiValidate } from './config';
       },
       logging: false,
     }),
+    UsersModule,
+    TasksModule,
+    AuthModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

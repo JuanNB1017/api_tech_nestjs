@@ -129,3 +129,88 @@ Solo los usuarios autenticados podrán gestionar sus propias tareas.
 2. El repositorio debe incluir un archivo `README.md` con las instrucciones para:
    - Explicación de cualquier tecnología utilizada.
    - Cualquier informacion adicional al proyecto
+
+## ACTUALIZACION Por JuanNB1017
+
+Se completaron los requerimientos establecidos por los parametos descritos en este archivo, Completando las URLs requeridas para las peticiones sobre modificacion y peticion de Tareas y Usuarios, A continuacion dejare una pequeña documentacion sobre los APIs realizados.
+
+## Documentacion:
+
+1.- *** Sign Up ***
+   - URL: `http://localhost:3001/auth/signup`
+   - METHOD: `POST`
+   - Parametros de entrada: { "username": "Jhon Smith", "password": "Smith1234" }
+   - Response:  
+      - Peticion exitosa: { "id": 200,"username": "username" }
+      - Peticion fallida por usuario duplicado: { "message": "Este usuario ya está en uso, intente otro diferente", "error": "Conflict", "statusCode": 409 }
+      - Peticion erronea por conexiones: { "statusCode": 500, "message": "Internal server error" }
+
+2.- *** Login ***
+   - URL: `http://localhost:3001/auth/login`
+   - METHOD: `POST`
+   - Parametros de entrada: { "username": "Jhon Smith", "password": "Smith1234" }
+   - Response:  
+      - Peticion exitosa: { "access_token": "eyJhbGciOiJIUzI" }
+      - Peticion fallida por credenciales: { "message": "Credenciales inválidas", "error": "Unauthorized", "statusCode": 401 }
+      - Peticion erronea por conexiones: { "statusCode": 500, "message": "Internal server error" }
+
+3.- *** Get Tasks ***
+   - URL: `http://localhost:3001/tasks`
+   - METHOD: `GET`
+   - Authentication: Bearer eyJhbGciOiJIUzI...
+   - Response:
+      - Peticion exitosa: [{"id": 1,"title": "Task 1","deletedAt": null...},{...},...]
+      - Peticion denegada por JWT: {"message": "Unauthorized","statusCode": 401}
+      - Peticion erronea por conexiones: { "statusCode": 500, "message": "Internal server error" }
+
+4.- *** Post Tasks ***
+   - URL: `http://localhost:3001/tasks`
+   - METHOD: `POST`
+   - Parametros de entrada: { "title":"mi tarea", "description": "Una prueba" }
+   - Authentication: Bearer eyJhbGciOiJIUzI...
+   - Response:
+      - Peticion exitosa: [{"id": 1,"title": "mi tarea","description": "Una prueba"...}]
+      - Peticion denegada por JWT: {"message": "Unauthorized","statusCode": 401}
+      - Peticion erronea por conexiones: { "statusCode": 500, "message": "Internal server error" }
+
+5.- *** Put Tasks ***
+   - URL: `http://localhost:3001/tasks/:idTask:`
+   - METHOD: `PUT`
+   - Parametros de entrada: { "state": "in_progress",/*Opcionales*/ "description": "Una prueba" "title":"mi tarea"}
+   - Authentication: Bearer eyJhbGciOiJIUzI...
+   - Response:
+      - Peticion exitosa: [{"id": 1,"title": "mi tarea modificada","description": "Una prueba"...}]
+      - Peticion denegada por Tarea eliminada o no pertenece al usaurio: { "message": "Task not found or this task does not belong to the user","error": "Not Found","statusCode": 404}
+      - Peticion denegada por JWT: {"message": "Unauthorized","statusCode": 401}
+      - Peticion erronea por conexiones: { "statusCode": 500, "message": "Internal server error" }
+
+6.- *** Delete Tasks ***
+   - URL: `http://localhost:3001/tasks/:idTask:`
+   - METHOD: `DELETE`
+   - Authentication: Bearer eyJhbGciOiJIUzI...
+   - Response:
+      - Peticion exitosa: { "message": "task has been eliminated","error": "Request", "statusCode": 200 }
+      - Peticion denegada por Tarea eliminada o no pertenece al usaurio: { "message": "Task not found or this task does not belong to the user","error": "Not Found","statusCode": 404}
+      - Peticion denegada por JWT: {"message": "Unauthorized","statusCode": 401}
+      - Peticion erronea por conexiones: { "statusCode": 500, "message": "Internal server error" }
+
+## Añadidos y configuracion
+
+<p>
+  Gestión de Tareas (CRUD): Las operaciones CRUD están implementadas para la gestión de tareas. Los usuarios pueden crear, actualizar, eliminar y obtener listas de tareas.
+</p>
+<p>
+   Autenticación JWT: Durante el registro y el inicio de sesión, se genera un token JWT que se usa para validar las peticiones posteriores. Se implementaron estrategias de protección en rutas usando Guards.
+</p>
+<p>
+   Conexión a MySQL con Sequelize: Sequelize fue configurado como ORM para manejar la persistencia de los datos en MySQL, simplificando las consultas y el mapeo de las tablas hacia modelos en el código.
+</p>
+<p>
+   Creacion de modelos: Los modelos fueron especificados para la ejecucion de representaciones en código de las tablas de la base de datos en workbench, definidas con Sequelize ORM.
+</p>
+<p>
+   TDD (Test-Driven Development): El proyecto implementa pruebas para asegurar que las funcionalidades claves, como la autenticación y la gestión de tareas, funcionen correctamente.
+</p>
+<p>
+   Bcrypt: bcrypt se usa para generar un hash seguro de la contraseña antes de almacenarla en la base de datos. Esto se logra con bcrypt.hash(password, 10), donde el número 10 representa el "factor de costo" (cuántas veces se aplica el algoritmo de hash para aumentar su seguridad).
+</p>
